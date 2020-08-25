@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		body {
+			font-family: Arial, Helvetica, sans-serif;
+		}
+
+		/* The Modal (background) */
+		.modal {
+			display: none;
+			/* Hidden by default */
+			position: fixed;
+			/* Stay in place */
+			z-index: 1;
+			/* Sit on top */
+			padding-top: 100px;
+			/* Location of the box */
+			left: 0;
+			top: 0;
+			width: 100%;
+			/* Full width */
+			height: 100%;
+			/* Full height */
+			overflow: auto;
+			/* Enable scroll if needed */
+			background-color: rgb(0, 0, 0);
+			/* Fallback color */
+			background-color: rgba(0, 0, 0, 0.4);
+			/* Black w/ opacity */
+		}
+
+		/* Modal Content */
+		.modal-content {
+			background-color: #fefefe;
+			margin: auto;
+			padding: 20px;
+			border: 1px solid #888;
+			width: 80%;
+		}
+
+		/* The Close Button */
+		.close {
+			color: #aaaaaa;
+			float: right;
+			font-size: 28px;
+			font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+			color: #000;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		.buttonload {
+			background-color: DodgerBlue;
+			/* Green background */
+			border: none;
+			/* Remove borders */
+			color: white;
+			/* White text */
+			padding: 12px 16px;
+			/* Some padding */
+			font-size: 16px
+				/* Set a font size */
+		}
+
+		body {
+			background-image: url('image_supplier1');
+			/* Source: iStockPhoto */
+			background-repeat: no-repeat;
+			background-size: 750px;
+			background-position-y: 40px;
+			background-position-x: 300px;
+		}
+	</style>
+	<meta charset="UTF-8">
+	<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" type="text/javascript"></script>
+
+	<title id="title">Data and Asset Transfer between Blockchains</title>
+
+</head>
+
+<body>
+
+	<h3>Data and Asset Transfer between Blockchains </h3>
+
+	<h3> (Showcase: Supplychain data/ asset transfer </h3>
+
+	<h3>from Ethereum (Rinkeby Testnet) to Hyperledger Fabric 2.0)</h3>
+	<br></br>
+
+	<input id="key1" type="text" value="Type in the key of asset!">
+	<input id="value" type="text" value="Type in log data!"><br></br>
+
+	<input id="invoke_ethereum" type="submit" value="Click to log asset data to Ethereum!"
+		onclick="invoke_ethereum()"><br></br><br></br>
+
+	<input name="key" id="key2" type="text" value="Type in the key of asset!"><br></br>
+	<input id="query_ethereum" type="submit" value="Click to query asset data from Ethereum!"
+		onclick="query_ethereum()">
+	<br></br><br></br>
+	<!-- The Modal -->
+	<div id="myModal" class="modal">
+
+		<!-- Modal content -->
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<p id="wichtig"></p>
+		</div>
+
+	</div>
+
+	<p>Additional info:</p>
+	<p>This is the link to the contract on the Rinkeby test net:
+	<p>
+		<a
+			href="https://rinkeby.etherscan.io/address/0x78fAF84E08ed839d3Fde0753C07E5C505f1a3F93">https://rinkeby.etherscan.io/address/0x78fAF84E08ed839d3Fde0753C07E5C505f1a3F93</a>
+		<script>
+			var web3 = new Web3(Web3.givenProvider || "ws://ropsten.infura.io/v3/6d785757971742a5a841898f704604fc");
+			var abi = [
+				{
+					"constant": false,
+					"inputs": [
+						{
+							"internalType": "string",
+							"name": "_key",
+							"type": "string"
+						},
+						{
+							"internalType": "string",
+							"name": "_value",
+							"type": "string"
+						}
+					],
+					"name": "store",
+					"outputs": [],
+					"payable": false,
+					"stateMutability": "nonpayable",
+					"type": "function"
+				},
+				{
+					"constant": true,
+					"inputs": [
+						{
+							"internalType": "string",
+							"name": "_key",
+							"type": "string"
+						}
+					],
+					"name": "length",
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					],
+					"payable": false,
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"constant": true,
+					"inputs": [
+						{
+							"internalType": "string",
+							"name": "_key",
+							"type": "string"
+						},
+						{
+							"internalType": "uint256",
+							"name": "index",
+							"type": "uint256"
+						}
+					],
+					"name": "retrieve",
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						},
+						{
+							"internalType": "string",
+							"name": "",
+							"type": "string"
+						}
+					],
+					"payable": false,
+					"stateMutability": "view",
+					"type": "function"
+				}
+			];
+
+			ethereum.enable()
+
+			var mycontract = new web3.eth.Contract(abi, '0x78fAF84E08ed839d3Fde0753C07E5C505f1a3F93');
+
+			async function query_ethereum() {
+
+				$("#wichtig").empty()
+
+				var length = await mycontract.methods.length($("#key2").val()).call()
+
+				if (length == 0) {
+					$("#wichtig").append(`<p>No record on Ethereum!</p>`);
+
+					var modal = document.getElementById("myModal");
+					modal.style.display = "block";
+
+					var span = document.getElementsByClassName("close")[0];
+
+					// When the user clicks on <span> (x), close the modal
+					span.onclick = function () {
+						modal.style.display = "none";
+					}
+				} else {
+					$("#wichtig").append(`<p><center>Product key:<b> ${$("#key2").val()}</b></center></p>`);
+					for (var i = 0; i < length; i++) {
+						var response = await mycontract.methods.retrieve($("#key2").val(), i).call();
+
+						var time = new Date(response[0] * 1000)
+						$("#wichtig").append(`<p>Timestamp: ${time}, Action: <b>${response[1]}</b></p>`);
+					}
+					var modal = document.getElementById("myModal");
+					modal.style.display = "block";
+
+					// Get the <span> element that closes the modal
+					var span = document.getElementsByClassName("close")[0];
+
+					// When the user clicks on <span> (x), close the modal
+					span.onclick = function () {
+						modal.style.display = "none";
+					}
+				}
+			}
+
+			async function invoke_ethereum() {
+
+				$("#wichtig").empty()
+				$("#wichtig").append(`<center> <p>Ethereum will need some time to record transaction. Please be patient.</p><button class="buttonload"><i class="fa fa-spinner fa-spin"></i>  Loading </button></center></p>`);
+
+				var modal = document.getElementById("myModal");
+				modal.style.display = "block";
+
+				var array = await web3.eth.getAccounts();
+				web3.eth.defaultAccount = array[0];
+
+				mycontract.methods.store($("#key1").val(), $("#value").val()).send({ from: web3.eth.defaultAccount }).then(function (response) {
+					$("#wichtig").empty()
+					$("#wichtig").append(`<p>Your data was recorded on the Ethereum blockain. You can check it out by following this link. Click the "Click to see More" button to expand the view. Then, go to "Input Data:" and select "UTF-8" at the drop-down field "View Input As" to query the recorded data on the Ethereum blockchain:</p>`);
+					$("#wichtig").append(`<a id="lets">https://rinkeby.etherscan.io/tx/${response.transactionHash}</a>`);
+					$("#lets").attr("href", `https://rinkeby.etherscan.io/tx/${response.transactionHash}`);
+
+					var modal = document.getElementById("myModal");
+					modal.style.display = "block";
+
+					var span = document.getElementsByClassName("close")[0];
+					// When the user clicks on <span> (x), close the modal
+					span.onclick = function () {
+						modal.style.display = "none";
+					}
+				}).catch(console.log);
+			}
+		</script>
+</body>
+
+</html>

@@ -1,0 +1,2 @@
+Installed chaincodes on peer:
+Package ID: ttcc_1:c4a838676700bbffb4c488dcf117f03c3bc3b95801cbc0998eb509416805b37f, Label: ttcc_1

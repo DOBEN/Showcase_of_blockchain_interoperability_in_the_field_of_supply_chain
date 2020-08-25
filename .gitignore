@@ -1,0 +1,5 @@
+/website/wallet/*
+/website/node_modules/*
+/fabric-network/first-network/crypto-config/*
+/fabric-network/chaincode/go/vendor/*
+
